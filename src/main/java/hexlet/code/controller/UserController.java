@@ -5,7 +5,7 @@ import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UpdateUserDTO;
 import hexlet.code.exception.ResourceNotFound;
 import hexlet.code.mapper.UserMapper;
-import hexlet.code.repository.UserRepository;
+import hexlet.code.repository.UserRepo;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ import java.util.List;
 public final class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepo userRepository;
 
     @Autowired
     private UserMapper userMapper;
