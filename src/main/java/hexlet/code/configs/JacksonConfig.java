@@ -1,4 +1,4 @@
-package hexlet.code.config;
+package hexlet.code.configs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
-public class Jackson {
+public class JacksonConfig {
     @Bean
-    public static Jackson2ObjectMapperBuilder objectMapperBuilder() {
+    Jackson2ObjectMapperBuilder objectMapperBuilder() {
         var builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.NON_NULL)
                 .modulesToInstall(new JsonNullableModule());
