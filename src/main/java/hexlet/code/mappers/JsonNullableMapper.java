@@ -1,4 +1,4 @@
-package hexlet.code.mapper;
+package hexlet.code.mappers;
 
 import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
@@ -9,16 +9,17 @@ import org.openapitools.jackson.nullable.JsonNullable;
         componentModel = MappingConstants.ComponentModel.SPRING
 )
 public abstract class JsonNullableMapper {
-    public final  <T> JsonNullable<T> wrap(T entity) {
+
+    public <T> JsonNullable<T> wrap(T entity) {
         return JsonNullable.of(entity);
     }
 
-    public final <T> T unwrap(JsonNullable<T> jsonNullable) {
+    public <T> T unwrap(JsonNullable<T> jsonNullable) {
         return jsonNullable == null ? null : jsonNullable.orElse(null);
     }
 
     @Condition
-    public final <T> boolean isPresent(JsonNullable<T> nullable) {
+    public <T> boolean isPresent(JsonNullable<T> nullable) {
         return nullable != null && nullable.isPresent();
     }
 }

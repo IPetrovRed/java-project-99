@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepo extends JpaRepository<hexlet.code.model.User, Long> {
+public interface UserRepository extends JpaRepository<hexlet.code.model.User, Long> {
     Optional<hexlet.code.model.User> findByEmail(String email);
 }
