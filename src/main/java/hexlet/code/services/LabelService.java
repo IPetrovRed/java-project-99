@@ -1,17 +1,48 @@
 package hexlet.code.services;
 
-import hexlet.code.component.ResourceNotFound;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import hexlet.code.dto.labels.CreateDTO;
+import hexlet.code.dto.labels.DTO;
+import hexlet.code.dto.labels.UpdateDTO;
+import hexlet.code.mappers.LabelMapper;
+import hexlet.code.repositories.LabelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@ControllerAdvice
-public final class GlobalException extends ResponseEntityExceptionHandler {
+import java.util.List;
 
-    @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFound ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+@Service
+public class LabelService {
+
+    @Autowired
+    private LabelRepository repository;
+
+    @Autowired
+    private LabelMapper mapper;
+
+    public List<DTO> getAll() {
+        return mapper.map(repository.findAll());
+    }
+
+    public DTO create(CreateDTO createDTO) {
+        var label = mapper.map(createDTO);
+        repository.save(label);
+        return mapper.map(label);
+    }
+
+    public DTO findById(Long id) {
+        return mapper.map(repository.findById(id)
+                .orElseThrow());
+    }
+
+    public DTO update(UpdateDTO updateDTO, Long id) {
+        var label = repository.findById(id)
+                .orElseThrow();
+        mapper.update(updateDTO, label);
+        repository.save(label);
+        return mapper.map(label);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
     }
 }
