@@ -1,4 +1,4 @@
-package hexlet.code.dto.users;
+package hexlet.code.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

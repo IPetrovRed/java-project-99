@@ -5,7 +5,7 @@ import hexlet.code.dto.users.UserDTO;
 import hexlet.code.dto.users.UserUpdateDTO;
 import hexlet.code.mappers.UserMapper;
 import hexlet.code.services.UserService;
-import hexlet.code.utils.UserUtils;
+import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;

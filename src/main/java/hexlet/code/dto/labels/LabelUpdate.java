@@ -11,11 +11,11 @@ import org.openapitools.jackson.nullable.JsonNullable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LabelUpdateDTO {
+public class LabelUpdate {
     @Size(min = 3, max = 1000)
     private JsonNullable<String> name;
 
-    public LabelUpdateDTO(String name) {
+    public LabelUpdate(String name) {
         this.name = JsonNullable.of(name);
     }
 }
