@@ -3,43 +3,105 @@ package hexlet.code.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import lombok.Data;
+import lombok.ToString;
+import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+public class User implements BaseEntity, UserDetails {
 
-public class User implements DefaultEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
+    private long id;
 
+    @NotBlank
+    @ToString.Include
     private String firstName;
 
+    @NotBlank
+    @ToString.Include
     private String lastName;
 
+    @Email
     @Column(unique = true)
+    @ToString.Include
     private String email;
 
-    private String password;
-
-    @LastModifiedDate
-    private LocalDate createdAt;
+    @NotNull
+    private String passwordDigest;
 
     @CreatedDate
+    private LocalDate createdAt;
+
+    @LastModifiedDate
     private LocalDate updatedAt;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Task> tasks = new ArrayList<>();
+
+    public User(long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordDigest;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 }

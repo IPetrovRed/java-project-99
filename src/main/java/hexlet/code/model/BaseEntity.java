@@ -1,4 +1,4 @@
 package hexlet.code.model;
 
-public interface DefaultEntity {
+public interface BaseEntity {
 }
