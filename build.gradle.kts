@@ -15,6 +15,7 @@ version = "0.0.1-SNAPSHOT"
 
 application {
 	mainClass.set("hexlet.code.AppApplication")
+	applicationName = "app"
 }
 
 java {
