@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING
 )
-public abstract class ReferenceMapper {
+public abstract class Reference {
     @Autowired
     private EntityManager entityManager;
 
