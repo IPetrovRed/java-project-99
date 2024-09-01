@@ -1,10 +1,10 @@
 package hexlet.code.services;
 
-import hexlet.code.dto.taskStatuses.CreateDTO;
-import hexlet.code.dto.taskStatuses.DTO;
-import hexlet.code.dto.taskStatuses.UpdateDTO;
+import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
+import hexlet.code.dto.taskStatuses.TaskStatusDTO;
+import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
 
-import hexlet.code.mappers.TaskStatusMapper;
+import hexlet.code.mappers.TaskStatus;
 import hexlet.code.repositories.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,33 +20,33 @@ public class TaskStatusService {
     private TaskStatusRepository repository;
 
     @Autowired
-    private TaskStatusMapper mapper;
+    private TaskStatus mapper;
 
-    public List<DTO> getAll(PageRequest pageRequest) {
+    public List<TaskStatusDTO> getAll(PageRequest pageRequest) {
         return repository.findAll(pageRequest).map(mapper::map).toList();
 
     }
 
-    public List<DTO> getAll() {
+    public List<TaskStatusDTO> getAll() {
         return repository.findAll().stream().map(mapper::map).toList();
     }
 
-    public DTO create(CreateDTO createDTO) {
+    public TaskStatusDTO create(TaskStatusCreateDTO taskStatusCreateDTO) {
 
-        var taskStatus = mapper.map(createDTO);
+        var taskStatus = mapper.map(taskStatusCreateDTO);
         repository.save(taskStatus);
         return mapper.map(taskStatus);
     }
 
-    public DTO findById(Long id) {
+    public TaskStatusDTO findById(Long id) {
         return mapper.map(repository.findById(id)
                 .orElseThrow());
     }
 
-    public DTO update(UpdateDTO updateDTO, Long id) {
+    public TaskStatusDTO update(TaskStatusUpdateDTO taskStatusUpdateDTO, Long id) {
         var taskStatus = repository.findById(id)
                 .orElseThrow();
-        mapper.update(updateDTO, taskStatus);
+        mapper.update(taskStatusUpdateDTO, taskStatus);
         repository.save(taskStatus);
         return mapper.map(taskStatus);
 

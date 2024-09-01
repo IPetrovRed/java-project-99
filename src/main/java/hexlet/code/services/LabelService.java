@@ -1,8 +1,8 @@
 package hexlet.code.services;
 
-import hexlet.code.dto.labels.CreateDTO;
-import hexlet.code.dto.labels.DTO;
-import hexlet.code.dto.labels.UpdateDTO;
+import hexlet.code.dto.labels.LabelCreate;
+import hexlet.code.dto.labels.LabelDTO;
+import hexlet.code.dto.labels.LabelUpdate;
 import hexlet.code.mappers.LabelMapper;
 import hexlet.code.repositories.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +19,25 @@ public class LabelService {
     @Autowired
     private LabelMapper mapper;
 
-    public List<DTO> getAll() {
+    public List<LabelDTO> getAll() {
         return mapper.map(repository.findAll());
     }
 
-    public DTO create(CreateDTO createDTO) {
-        var label = mapper.map(createDTO);
+    public LabelDTO create(LabelCreate labelCreateDTO) {
+        var label = mapper.map(labelCreateDTO);
         repository.save(label);
         return mapper.map(label);
     }
 
-    public DTO findById(Long id) {
+    public LabelDTO findById(Long id) {
         return mapper.map(repository.findById(id)
                 .orElseThrow());
     }
 
-    public DTO update(UpdateDTO updateDTO, Long id) {
+    public LabelDTO update(LabelUpdate labelUpdateDTO, Long id) {
         var label = repository.findById(id)
                 .orElseThrow();
-        mapper.update(updateDTO, label);
+        mapper.update(labelUpdateDTO, label);
         repository.save(label);
         return mapper.map(label);
     }

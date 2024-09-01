@@ -1,6 +1,6 @@
 package hexlet.code.configs;
 
-import hexlet.code.services.CustomUserDetailsService;
+import hexlet.code.services.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +32,7 @@ public class SecurityConfig {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private CustomUserDetailsService userService;
+    private CustomUserDetails userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
