@@ -39,12 +39,11 @@ repositories {
 	maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
-sentry {
-	includeSourceContext = true
-
-	org = "student-em5"
-	projectName = "java"
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+sentry if (System.getenv("SENTRY_AUTH_TOKEN") != null) {
+	sentry {
+		includeSourceContext = true
+		authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	}
 }
 
 tasks.sentryBundleSourcesJava {
