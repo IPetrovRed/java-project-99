@@ -10,9 +10,17 @@ https://java-project-99-bmgf.onrender.com
 ## Task Manager
 ``` 
 TASK MANAGER - task management system for users. 
-It allows you to create tasks, assign performers, change their statuses and add new users to project.
+It allows you to:
+ - create tasks;
+ - assign performers;
+ - change task statuses;
+ - add new users to project.
+ - delete users.
 ```
+
+#### Demo website registration
 ```
 To access the system, registration and authentication are required: 
-login: hexlet@example.com password: qwerty
+- login: hexlet@example.com 
+- password: qwerty
 ```
