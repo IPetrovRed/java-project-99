@@ -1,12 +1,11 @@
 package hexlet.code.component;
 
-import hexlet.code.dto.labels.LabelCreate;
+import hexlet.code.dto.labels.LabelCreateDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
 import hexlet.code.dto.users.UserCreateDTO;
 import hexlet.code.services.LabelService;
 import hexlet.code.services.TaskStatusService;
 import hexlet.code.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -14,14 +13,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final TaskStatusService taskStatusService;
+    private final LabelService labelService;
 
-    @Autowired
-    private TaskStatusService taskStatusService;
-
-    @Autowired
-    private LabelService labelService;
+    public DataInitializer(UserService userService,
+                           TaskStatusService taskStatusService,
+                           LabelService labelService) {
+        this.userService = userService;
+        this.taskStatusService = taskStatusService;
+        this.labelService = labelService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -38,8 +40,8 @@ public class DataInitializer implements ApplicationRunner {
         taskStatusService.create(new TaskStatusCreateDTO("ToPublish", "to_publish"));
         taskStatusService.create(new TaskStatusCreateDTO("Published", "published"));
 
-        labelService.create(new LabelCreate("bug"));
-        labelService.create(new LabelCreate("feature"));
+        labelService.create(new LabelCreateDTO("bug"));
+        labelService.create(new LabelCreateDTO("feature"));
 
     }
 }

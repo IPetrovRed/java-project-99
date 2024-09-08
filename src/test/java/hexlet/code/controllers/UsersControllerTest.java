@@ -8,20 +8,13 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
-
-
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-
 import org.springframework.test.web.servlet.MockMvc;
-
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,10 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -66,8 +57,6 @@ public class UsersControllerTest {
     }
     @Test
     public void testShow() throws Exception {
-
-
 
         var request = get("/api/users/{id}", testUser.getId()).with(jwt());
         var result = mockMvc.perform(request)
@@ -166,5 +155,4 @@ public class UsersControllerTest {
                 .andExpect(status().isForbidden());
 
     }
-
 }

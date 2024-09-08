@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LabelCreate {
+public class LabelCreateDTO {
     @Size(min = 3, max = 1000)
     private String name;
 }

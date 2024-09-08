@@ -1,8 +1,8 @@
 package hexlet.code.mappers;
 
-import hexlet.code.dto.labels.LabelCreate;
+import hexlet.code.dto.labels.LabelCreateDTO;
 import hexlet.code.dto.labels.LabelDTO;
-import hexlet.code.dto.labels.LabelUpdate;
+import hexlet.code.dto.labels.LabelUpdateDTO;
 import hexlet.code.model.Label;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -20,11 +20,11 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public abstract class LabelMapper {
-    public abstract Label map(LabelCreate dto);
+    public abstract Label map(LabelCreateDTO dto);
     public abstract List<LabelDTO> map(List<Label> list);
 
     public abstract LabelDTO map(Label model);
 
-    public abstract void update(LabelUpdate dto, @MappingTarget Label model);
+    public abstract void update(LabelUpdateDTO dto, @MappingTarget Label model);
 
 }

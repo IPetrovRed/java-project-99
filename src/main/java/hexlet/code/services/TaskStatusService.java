@@ -3,12 +3,9 @@ package hexlet.code.services;
 import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
-
 import hexlet.code.mappers.TaskStatus;
 import hexlet.code.repositories.TaskStatusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +13,16 @@ import java.util.List;
 @Service
 public class TaskStatusService {
 
-    @Autowired
-    private TaskStatusRepository repository;
+    private final TaskStatusRepository repository;
+    private final TaskStatus mapper;
 
-    @Autowired
-    private TaskStatus mapper;
+    public TaskStatusService(TaskStatusRepository repository, TaskStatus mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     public List<TaskStatusDTO> getAll(PageRequest pageRequest) {
         return repository.findAll(pageRequest).map(mapper::map).toList();
-
     }
 
     public List<TaskStatusDTO> getAll() {
@@ -32,7 +30,6 @@ public class TaskStatusService {
     }
 
     public TaskStatusDTO create(TaskStatusCreateDTO taskStatusCreateDTO) {
-
         var taskStatus = mapper.map(taskStatusCreateDTO);
         repository.save(taskStatus);
         return mapper.map(taskStatus);
@@ -49,11 +46,9 @@ public class TaskStatusService {
         mapper.update(taskStatusUpdateDTO, taskStatus);
         repository.save(taskStatus);
         return mapper.map(taskStatus);
-
     }
 
     public void delete(Long id) {
         repository.deleteById(id);
     }
-
 }

@@ -6,7 +6,6 @@ import hexlet.code.dto.users.UserUpdateDTO;
 import hexlet.code.mappers.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,12 +15,13 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
+    private final UserMapper mapper;
 
-    @Autowired
-    private UserMapper mapper;
-
+    public UserService(UserRepository repository, UserMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     public Page<User> getAll(Pageable pageable) {
         return repository.findAll(pageable);
@@ -54,5 +54,4 @@ public class UserService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
-
 }

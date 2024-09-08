@@ -7,22 +7,21 @@ import hexlet.code.mappers.UserMapper;
 import hexlet.code.services.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -30,15 +29,15 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class Users {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final UserUtils userUtils;
 
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UserUtils userUtils;
+    public Users(UserService userService, UserMapper userMapper, UserUtils userUtils) {
+        this.userService = userService;
+        this.userMapper = userMapper;
+        this.userUtils = userUtils;
+    }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll(
@@ -78,5 +77,4 @@ public class Users {
     public void destroyById(@PathVariable Long id) {
         userService.delete(id);
     }
-
 }

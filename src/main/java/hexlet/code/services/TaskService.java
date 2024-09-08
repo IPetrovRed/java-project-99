@@ -1,15 +1,11 @@
 package hexlet.code.services;
 
-
 import hexlet.code.dto.tasks.CreateDTO;
 import hexlet.code.dto.tasks.TaskDTO;
 import hexlet.code.dto.tasks.UpdateDTO;
 import hexlet.code.mappers.TaskMapper;
-
 import hexlet.code.model.Task;
 import hexlet.code.repositories.TaskRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -19,11 +15,13 @@ import java.util.List;
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository repository;
+    private final TaskRepository repository;
+    private final TaskMapper mapper;
 
-    @Autowired
-    private TaskMapper mapper;
+    public TaskService(TaskRepository repository, TaskMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     public List<TaskDTO> getAll(Specification<Task> spec, PageRequest pageRequest) {
         return repository.findAll(spec, pageRequest).map(mapper::map).toList();
