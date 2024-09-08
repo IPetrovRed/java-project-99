@@ -1,5 +1,4 @@
 plugins {
-	java
 	jacoco
 	id("checkstyle")
 	id("io.sentry.jvm.gradle") version "4.11.0"
