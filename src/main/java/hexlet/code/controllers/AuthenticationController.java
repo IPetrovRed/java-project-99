@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping
-public class Authentication {
+public class AuthenticationController {
 
     private final JWTUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
-    public Authentication(JWTUtils jwtUtils, AuthenticationManager authenticationManager) {
+    public AuthenticationController(JWTUtils jwtUtils, AuthenticationManager authenticationManager) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
     }

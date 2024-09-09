@@ -27,13 +27,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-public class Users {
+public class UsersController {
 
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserUtils userUtils;
 
-    public Users(UserService userService, UserMapper userMapper, UserUtils userUtils) {
+    public UsersController(UserService userService, UserMapper userMapper, UserUtils userUtils) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.userUtils = userUtils;

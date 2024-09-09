@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class UsersControllerTest {
+public class UsersControllerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -131,7 +131,7 @@ public class UsersControllerTest {
                 .with(jwt().jwt(builder -> builder.subject(testUser.getEmail())));
 
         mockMvc.perform(delReq).andExpect(status().isNoContent());
-        assertFalse(userRepository.findByEmail(testUser.getEmail()).isPresent());
+        assertThat(userRepository.existsById(testUser.getId())).isEqualTo(false);
     }
 
     @Test

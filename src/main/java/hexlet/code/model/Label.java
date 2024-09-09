@@ -35,7 +35,7 @@ public class Label implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<Task> tasks = new HashSet<>();
 
     public Label(Long id) {

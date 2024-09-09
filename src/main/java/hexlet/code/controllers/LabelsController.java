@@ -20,11 +20,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/labels")
-public class Labels {
+public class LabelsController {
 
     private final LabelService labelService;
 
-    public Labels(LabelService labelService) {
+    public LabelsController(LabelService labelService) {
         this.labelService = labelService;
     }
 
