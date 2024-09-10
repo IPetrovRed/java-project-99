@@ -17,7 +17,7 @@ import org.mapstruct.ReportingPolicy;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public abstract class TaskStatus {
+public abstract class TaskStatusMapper {
 
     public abstract hexlet.code.model.TaskStatus map(TaskStatusCreateDTO dto);
 

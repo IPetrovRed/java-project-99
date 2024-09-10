@@ -3,7 +3,7 @@ package hexlet.code.services;
 import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
-import hexlet.code.mappers.TaskStatus;
+import hexlet.code.mappers.TaskStatusMapper;
 import hexlet.code.repositories.TaskStatusRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -14,9 +14,9 @@ import java.util.List;
 public class TaskStatusService {
 
     private final TaskStatusRepository repository;
-    private final TaskStatus mapper;
+    private final TaskStatusMapper mapper;
 
-    public TaskStatusService(TaskStatusRepository repository, TaskStatus mapper) {
+    public TaskStatusService(TaskStatusRepository repository, TaskStatusMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
