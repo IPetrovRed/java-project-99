@@ -6,6 +6,7 @@ import hexlet.code.dto.users.UserCreateDTO;
 import hexlet.code.services.LabelService;
 import hexlet.code.services.TaskStatusService;
 import hexlet.code.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -13,17 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements ApplicationRunner {
 
-    private final UserService userService;
-    private final TaskStatusService taskStatusService;
-    private final LabelService labelService;
+    @Autowired
+    private UserService userService;
 
-    public DataInitializer(UserService userService,
-                           TaskStatusService taskStatusService,
-                           LabelService labelService) {
-        this.userService = userService;
-        this.taskStatusService = taskStatusService;
-        this.labelService = labelService;
-    }
+    @Autowired
+    private TaskStatusService taskStatusService;
+
+    @Autowired
+    private LabelService labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

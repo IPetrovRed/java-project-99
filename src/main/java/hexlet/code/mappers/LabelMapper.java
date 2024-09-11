@@ -20,9 +20,7 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public abstract class LabelMapper {
-
     public abstract Label map(LabelCreateDTO dto);
-
     public abstract List<LabelDTO> map(List<Label> list);
 
     public abstract LabelDTO map(Label model);

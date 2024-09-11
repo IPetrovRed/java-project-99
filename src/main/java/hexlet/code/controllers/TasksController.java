@@ -1,45 +1,46 @@
 package hexlet.code.controllers;
 
 import hexlet.code.dto.tasks.CreateDTO;
-import hexlet.code.dto.tasks.ParamsDTO;
 import hexlet.code.dto.tasks.TaskDTO;
+import hexlet.code.dto.tasks.ParamsDTO;
 import hexlet.code.dto.tasks.UpdateDTO;
 import hexlet.code.services.TaskService;
+
 import hexlet.code.specifications.Specification;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
 public class TasksController {
 
-    private final TaskService taskService;
-    private final Specification specification;
+    @Autowired
+    private TaskService taskService;
 
-    public TasksController(TaskService taskService, Specification specification) {
-        this.taskService = taskService;
-        this.specification = specification;
-    }
+    @Autowired
+    private Specification specification;
 
     @GetMapping
     public ResponseEntity<List<TaskDTO>> getAll(
-            ParamsDTO paramsDTO,
+            ParamsDTO taskParamsDTO,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "1000") Integer pageSize) {
-        var spec = specification.build(paramsDTO);
+        var spec = specification.build(taskParamsDTO);
         var pageable = PageRequest.of(page - 1, pageSize);
         var result = taskService.getAll(spec, pageable);
         return ResponseEntity.ok()
@@ -54,8 +55,8 @@ public class TasksController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO create(@Valid @RequestBody CreateDTO createDTO) {
-        return taskService.create(createDTO);
+    public TaskDTO create(@Valid @RequestBody CreateDTO taskCreateDTO) {
+        return taskService.create(taskCreateDTO);
     }
 
     @PutMapping("/{id}")

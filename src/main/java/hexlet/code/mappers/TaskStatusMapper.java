@@ -3,13 +3,14 @@ package hexlet.code.mappers;
 import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
+
 import hexlet.code.model.TaskStatus;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+
 
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
@@ -23,7 +24,6 @@ public abstract class TaskStatusMapper {
 
     public abstract TaskStatusDTO map(TaskStatus model);
 
-    @Mapping(target = "id", ignore = true)
     public abstract void update(TaskStatusUpdateDTO dto, @MappingTarget TaskStatus model);
 
 }

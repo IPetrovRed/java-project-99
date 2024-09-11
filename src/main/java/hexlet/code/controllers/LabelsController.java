@@ -5,28 +5,27 @@ import hexlet.code.dto.labels.LabelDTO;
 import hexlet.code.dto.labels.LabelUpdateDTO;
 import hexlet.code.services.LabelService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/labels")
 public class LabelsController {
 
-    private final LabelService labelService;
-
-    public LabelsController(LabelService labelService) {
-        this.labelService = labelService;
-    }
+    @Autowired
+    private LabelService labelService;
 
     @GetMapping
     private ResponseEntity<List<LabelDTO>> getAll() {
@@ -37,13 +36,13 @@ public class LabelsController {
     }
 
     @GetMapping("/{id}")
-    private LabelDTO getById(@PathVariable @Valid Long id) {
+    private LabelDTO getById(@PathVariable Long id) {
         return labelService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private LabelDTO create(@RequestBody @Valid LabelCreateDTO labelCreateDTO) {
+    private LabelDTO create(@RequestBody LabelCreateDTO labelCreateDTO) {
         return labelService.create(labelCreateDTO);
     }
 

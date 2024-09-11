@@ -5,6 +5,7 @@ import hexlet.code.dto.labels.LabelDTO;
 import hexlet.code.dto.labels.LabelUpdateDTO;
 import hexlet.code.mappers.LabelMapper;
 import hexlet.code.repositories.LabelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +13,11 @@ import java.util.List;
 @Service
 public class LabelService {
 
-    private final LabelRepository repository;
-    private final LabelMapper mapper;
+    @Autowired
+    private LabelRepository repository;
 
-    public LabelService(LabelRepository repository, LabelMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
+    @Autowired
+    private LabelMapper mapper;
 
     public List<LabelDTO> getAll() {
         return mapper.map(repository.findAll());
