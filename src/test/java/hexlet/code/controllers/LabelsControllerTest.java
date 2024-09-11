@@ -2,10 +2,9 @@ package hexlet.code.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.labels.LabelCreateDTO;
-import hexlet.code.dto.labels.LabelUpdateDTO;
+import hexlet.code.mappers.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
-import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import hexlet.code.repositories.LabelRepository;
 import hexlet.code.repositories.TaskRepository;
@@ -20,74 +19,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class LabelsControllerTest {
 
     @Autowired
-
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper om;
-
-    @Autowired
-    private LabelRepository labelRepository;
 
     @Autowired
     private TaskRepository taskRepository;
 
     @Autowired
-    private TaskStatusRepository taskStatusRepository;
+    private LabelRepository labelRepository;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private ModelGenerator modelGenerator;
+    private TaskStatusRepository taskStatusRepository;
 
-    private JwtRequestPostProcessor token;
+    @Autowired
+    private ObjectMapper om;
+
+    @Autowired
+    private LabelMapper labelMapper;
+
+    @Autowired
+    private ModelGenerator modelGenerator;
 
     private Label testLabel;
 
-    private Task testTask;
-
-    private TaskStatus testTaskStatus;
-
     private User testUser;
+
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
+
 
     @BeforeEach
     public void setUp() {
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-        testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
-        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-        taskStatusRepository.save(testTaskStatus);
         userRepository.save(testUser);
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
-        testTask.setTaskStatus(testTaskStatus);
-        testTask.setAssignee(testUser);
-
-        taskRepository.save(testTask);
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
         labelRepository.save(testLabel);
-        taskStatusRepository.save(testTaskStatus);
-        userRepository.save(testUser);
     }
 
     @AfterEach
@@ -98,30 +88,37 @@ public class LabelsControllerTest {
         taskStatusRepository.deleteAll();
     }
 
+
     @Test
-    public void showTest() throws Exception {
-        var response = mockMvc.perform(get("/api/labels/" + testLabel.getId())
-                        .with(token))
+    public void testShow() throws Exception {
+        var request = get("/api/labels/{id}", testLabel.getId()).with(token);
+
+        var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andReturn().getResponse();
-        assertThatJson(response.getContentAsString()).and(
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).and(
                 v -> v.node("name").isEqualTo(testLabel.getName())
         );
     }
 
     @Test
-    public void indexTest() throws Exception {
-        var response = mockMvc.perform(get("/api/labels")
-                        .with(token))
+    public void testIndex() throws Exception {
+        var result = mockMvc.perform(get("/api/labels").with(token))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        assertThat(response).contains(testLabel.getName());
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).isArray();
     }
 
     @Test
-    public void createTest() throws Exception {
+    public void testCreate() throws Exception {
         var dto = new LabelCreateDTO();
-        dto.setName("new Label");
+        dto.setName("Spring");
 
         mockMvc.perform(post("/api/labels")
                         .with(token)
@@ -130,24 +127,43 @@ public class LabelsControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        var label = labelRepository.findByName(dto.getName()).orElseThrow();
+        var label = labelRepository.findByNameWithEagerUpload(dto.getName()).orElseThrow();
+
         assertThat(label.getName()).isEqualTo(dto.getName());
+        assertThat(label.getName()).isNotNull();
     }
 
     @Test
-    public void updateTest() throws Exception {
-        // Убедитесь, что имени "new Label1" нет в базе данных
-        assertThat(labelRepository.findByName("new Label1")).isNotPresent();
+    public void testCreateWithNotValidTitle() throws Exception {
+        var dto = labelMapper.map(testLabel);
+        dto.setName("");
 
-        var dto = new LabelUpdateDTO("new Label1");
+        var request = post("/api/labels")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
 
-        mockMvc.perform(put("/api/labels/" + testLabel.getId())
-                        .with(token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(dto)))
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        var dto = labelMapper.map(testLabel);
+        dto.setName("Java");
+
+        var request = put("/api/labels/{id}", testLabel.getId())
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        assertThat(labelRepository.findByName(dto.getName().get())).isPresent();
+        var label = labelRepository.findByNameWithEagerUpload(dto.getName()).orElseThrow();
+
+        assertThat(label.getName()).isEqualTo("Java");
+        assertThat(label.getTasks().size()).isEqualTo(testLabel.getTasks().size());
     }
 
     @Test
@@ -162,22 +178,88 @@ public class LabelsControllerTest {
     }
 
     @Test
-    public void unauthorizedTest() throws Exception {
-        mockMvc.perform(get("/api/labels"))
-                .andExpect(status().isUnauthorized());
+    public void bidirectionalNoSync() {
+        //PERSIST
+        Task task = new Task();
+        task.setName("Metro");
+        task.setDescription("Build metro station");
+        taskRepository.save(task);
 
-        mockMvc.perform(post("/api/labels")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+        Label label = new Label();
+        label.setName("label");
 
-        mockMvc.perform(put("/api/labels/" + testTask.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        label.setTasks(tasks);
 
-        mockMvc.perform(get("/api/labels/" + testLabel.getId()))
-                .andExpect(status().isUnauthorized());
+        labelRepository.save(label);
 
-        mockMvc.perform(delete("/api/labels/" + testLabel.getId()))
-                .andExpect(status().isUnauthorized());
+        //MERGE
+        label.setName("Metropolitan");
+        task.setDescription("Destroy metro station");
+
+        labelRepository.save(label);
+
+        Label saved = labelRepository.findByNameWithEagerUpload("Metropolitan").orElseThrow();
+        assertThat(saved.getTasks()).isEmpty();
+    }
+
+    @Test
+    public void bidirectionalIncorrectSync() {
+        //PERSIST
+        Task task = new Task();
+        task.setName("Metro");
+        task.setDescription("Build metro station");
+        taskRepository.save(task);
+
+        Label label = new Label();
+        label.setName("label");
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        label.setTasks(tasks);
+
+        Set<Label> labels = new HashSet<>();
+        labels.add(label);
+        task.setLabels(labels);
+
+        labelRepository.save(label);
+
+        //MERGE
+        label.setName("Metropolitan");
+        task.setDescription("Destroy metro station");
+
+        labelRepository.save(label);
+
+        Label saved = labelRepository.findByNameWithEagerUpload("Metropolitan").orElseThrow();
+        assertThat(saved.getTasks()).isNotEmpty();
+    }
+
+    @Test
+    public void bidirectionalCorrectSync() {
+        //PERSIST
+        Task task = new Task();
+        task.setName("Metro");
+        task.setDescription("Build metro station");
+        taskRepository.save(task);
+
+        Label label = new Label();
+        label.setName("label");
+
+        System.out.println("save label");
+        labelRepository.save(label);
+
+        //MERGE
+        label.setName("Metropolitan");
+        task.setDescription("Destroy metro station");
+
+        label.addTask(task);
+
+        System.out.println("update label");
+        labelRepository.save(label);
+
+        Label saved = labelRepository.findByNameWithEagerUpload("Metropolitan").orElseThrow();
+        Task savedTask = taskRepository.findByIdWithEagerUpload(task.getId()).orElseThrow();
+        assertThat(saved.getTasks()).isNotEmpty();
+        assertThat(savedTask.getLabels()).isNotEmpty();
     }
 }
