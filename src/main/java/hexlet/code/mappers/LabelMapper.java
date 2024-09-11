@@ -5,12 +5,10 @@ import hexlet.code.dto.labels.LabelDTO;
 import hexlet.code.dto.labels.LabelUpdateDTO;
 import hexlet.code.model.Label;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
+import org.mapstruct.MappingTarget;
 
 
 @Mapper(
@@ -20,11 +18,10 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public abstract class LabelMapper {
-    public abstract Label map(LabelCreateDTO dto);
-    public abstract List<LabelDTO> map(List<Label> list);
 
-    public abstract LabelDTO map(Label model);
+    public abstract Label map(LabelCreateDTO labelCreateDTO);
 
-    public abstract void update(LabelUpdateDTO dto, @MappingTarget Label model);
+    public abstract LabelDTO map(Label label);
 
+    public abstract void update(LabelUpdateDTO labelUpdateDTO, @MappingTarget Label label);
 }
