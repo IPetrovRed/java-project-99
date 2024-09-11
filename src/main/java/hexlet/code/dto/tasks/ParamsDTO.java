@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ParamsDTO {
+
     private String titleCont;
     private Long assigneeId;
     private String status;

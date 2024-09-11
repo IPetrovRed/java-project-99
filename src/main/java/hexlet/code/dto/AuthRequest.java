@@ -8,8 +8,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class AuthRequest {
+
     @Email
     private String username;
+
     @Size(min = 3, max = 100)
     private String password;
 }
