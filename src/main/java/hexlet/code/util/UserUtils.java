@@ -1,19 +1,17 @@
 package hexlet.code.util;
 
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import hexlet.code.model.User;
 import hexlet.code.repositories.UserRepository;
-import lombok.AllArgsConstructor;
-
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
 public class UserUtils {
-
     private final UserRepository userRepository;
 
+    public UserUtils(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -21,18 +19,12 @@ public class UserUtils {
             return null;
         }
         var email = authentication.getName();
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new AuthenticationCredentialsNotFoundException("Not Authorised"));
+        return userRepository.findByEmail(email).get();
     }
 
-    public boolean isUser(long id) {
-        var userEmail = userRepository.findById(id).orElseThrow().getEmail();
+    public boolean checkUserPermission(Long id) {
+        var userEmail = userRepository.findById(id).get().getEmail();
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         return userEmail.equals(authentication.getName());
-    }
-
-    public User getAdmin() {
-        return userRepository.findByEmail("hexlet@example.com")
-                .orElseThrow(() -> new RuntimeException("User doesn't exist"));
     }
 }

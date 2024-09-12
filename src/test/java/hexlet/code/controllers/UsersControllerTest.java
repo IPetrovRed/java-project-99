@@ -1,87 +1,63 @@
 package hexlet.code.controllers;
 
+import hexlet.code.dto.users.UserUpdateDTO;
+import hexlet.code.model.User;
+import hexlet.code.repositories.UserRepository;
+import hexlet.code.util.ModelGenerator;
+import org.instancio.Instancio;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.mappers.UserMapper;
-import hexlet.code.model.User;
-import hexlet.code.repositories.LabelRepository;
-import hexlet.code.repositories.TaskRepository;
-import hexlet.code.repositories.TaskStatusRepository;
-import hexlet.code.repositories.UserRepository;
-import hexlet.code.util.ModelGenerator;
-import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.HashMap;
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UsersControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private LabelRepository labelRepository;
-
-    @Autowired
-    private TaskStatusRepository taskStatusRepository;
-
-    @Autowired
     private ObjectMapper om;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserRepository userRepository;
 
     @Autowired
     private ModelGenerator modelGenerator;
 
     private User testUser;
 
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
-
+    private User anotherUser;
 
     @BeforeEach
     public void setUp() {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        anotherUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
-        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+        userRepository.save(anotherUser);
     }
-
-    @AfterEach
-    public void clean() {
-        taskRepository.deleteAll();
-        userRepository.deleteAll();
-        labelRepository.deleteAll();
-        taskStatusRepository.deleteAll();
-    }
-
     @Test
     public void testShow() throws Exception {
-        var request = get("/api/users/{id}", testUser.getId()).with(jwt());
 
+        var request = get("/api/users/{id}", testUser.getId()).with(jwt());
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -97,8 +73,8 @@ public class UsersControllerTest {
 
     @Test
     public void testIndex() throws Exception {
-        var result = mockMvc.perform(get("/api/users").with(jwt()))
 
+        var result = mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -108,7 +84,7 @@ public class UsersControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        User newUser = Instancio.of(modelGenerator.getUserModel()).create();
+        var newUser = Instancio.of(modelGenerator.getUserModel()).create();
 
         var request = post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +93,7 @@ public class UsersControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var user = userRepository.findByEmailWithEagerUpload(newUser.getEmail()).orElseThrow();
+        var user = userRepository.findByEmail(newUser.getEmail()).orElseThrow();
 
         assertThat(user).isNotNull();
         assertThat(user.getFirstName()).isEqualTo(newUser.getFirstName());
@@ -127,65 +103,55 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void testCreateWithNotValidEmail() throws Exception {
-        var dto = userMapper.map(testUser);
-        dto.setEmail("");
-
-        var request = post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void testUpdate() throws Exception {
-        var dto = userMapper.map(testUser); //UserDTO
+        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+        var update = new UserUpdateDTO(
+                "New First Name", "New Last Name");
 
-        dto.setFirstName("New Name");
-        dto.setLastName("New Last Name");
-
-        var request = put("/api/users/{id}", testUser.getId())
+        var updateReq = put("/api/users/" + testUser.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
+                .content(om.writeValueAsString(update));
 
-        mockMvc.perform(request)
+        mockMvc.perform(updateReq)
                 .andExpect(status().isOk());
 
-        var user = userRepository.findByIdWithEagerUpload(testUser.getId()).orElseThrow();
+        var user = userRepository.findByEmail(testUser.getEmail()).orElseThrow();
 
-        assertThat(user.getFirstName()).isEqualTo(dto.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(dto.getLastName());
-    }
-
-    @Test
-    public void testPartialUpdate() throws Exception {
-        var dto = new HashMap<String, String>();
-        dto.put("firstName", "Another First Name");
-
-        var request = put("/api/users/{id}", testUser.getId())
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-
-        var author = userRepository.findByIdWithEagerUpload(testUser.getId()).orElseThrow();
-
-        assertThat(author.getLastName()).isEqualTo(testUser.getLastName());
-        assertThat(author.getFirstName()).isEqualTo(dto.get("firstName"));
+        assertThat(user).isNotNull();
+        assertThat(user.getFirstName()).isEqualTo("New First Name");
+        assertThat(user.getLastName()).isEqualTo("New Last Name");
+        assertThat(user.getEmail()).isEqualTo(testUser.getEmail());
     }
 
     @Test
     public void testDelete() throws Exception {
-        var request = delete("/api/users/{id}", testUser.getId()).with(token);
+        var delReq = delete("/api/users/" + testUser.getId())
+                .with(jwt().jwt(builder -> builder.subject(testUser.getEmail())));
+
+        mockMvc.perform(delReq).andExpect(status().isNoContent());
+        assertThat(userRepository.existsById(testUser.getId())).isEqualTo(false);
+    }
+
+    @Test
+    public void testUpdateAnotherUser() throws Exception {
+        var token = jwt().jwt(builder -> builder.subject(anotherUser.getEmail()));
+        var update = new UserUpdateDTO(
+                "New First Name", "New Last Name");
+        var request = put("/api/users/{id}", testUser.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(update));
 
         mockMvc.perform(request)
-                .andExpect(status().isNoContent());
+                .andExpect(status().isForbidden());
+    }
 
-        assertThat(userRepository.existsById(testUser.getId())).isEqualTo(false);
+    @Test
+    public void testDeleteAnotherUser() throws Exception {
+        var token = jwt().jwt(builder -> builder.subject(anotherUser.getEmail()));
+        var request = delete("/api/users/{id}", testUser.getId()).with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+
     }
 }

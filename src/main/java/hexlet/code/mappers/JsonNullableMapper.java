@@ -3,23 +3,22 @@ package hexlet.code.mappers;
 import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
-import org.openapitools.jackson.nullable.JsonNullable;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING
 )
 public abstract class JsonNullableMapper {
 
-    public <T> JsonNullable<T> wrap(T entity) {
-        return JsonNullable.of(entity);
+    public <T> org.openapitools.jackson.nullable.JsonNullable<T> wrap(T entity) {
+        return org.openapitools.jackson.nullable.JsonNullable.of(entity);
     }
 
-    public <T> T unwrap(JsonNullable<T> jsonNullable) {
+    public <T> T unwrap(org.openapitools.jackson.nullable.JsonNullable<T> jsonNullable) {
         return jsonNullable == null ? null : jsonNullable.orElse(null);
     }
 
     @Condition
-    public <T> boolean isPresent(JsonNullable<T> nullable) {
+    public <T> boolean isPresent(org.openapitools.jackson.nullable.JsonNullable<T> nullable) {
         return nullable != null && nullable.isPresent();
     }
 }
