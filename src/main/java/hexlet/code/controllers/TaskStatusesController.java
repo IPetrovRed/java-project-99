@@ -4,69 +4,61 @@ import hexlet.code.dto.taskStatuses.TaskStatusCreateDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusDTO;
 import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
 import hexlet.code.services.TaskStatusService;
-import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/task_statuses")
+@AllArgsConstructor
 public class TaskStatusesController {
 
-    @Autowired
-    private TaskStatusService taskStatusService;
+    private final TaskStatusService taskStatusService;
 
-    @Autowired
-    private UserUtils userUtils;
 
-    @GetMapping
-    public ResponseEntity<List<TaskStatusDTO>> getAll(
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "1000") Integer pageSize) {
-        var pageable = PageRequest.of(page - 1, pageSize);
-        var result = taskStatusService.getAll(pageable);
-        return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(taskStatusService.getAll().size()))
-                .body(result);
+    @GetMapping(path = "")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<TaskStatusDTO>> index() {
+        List<TaskStatusDTO> taskStatuses = taskStatusService.getAll();
+        return ResponseEntity
+                .ok()
+                .header("X-Total-Count", String.valueOf(taskStatuses.size()))
+                .body(taskStatuses);
     }
 
-    @GetMapping("/{id}")
-    public TaskStatusDTO getById(@PathVariable Long id) {
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskStatusDTO show(@PathVariable Long id) {
         return taskStatusService.findById(id);
     }
 
-    @PostMapping
+    @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO taskStatusCreateDTO) {
         return taskStatusService.create(taskStatusCreateDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO updateById(
-            @Valid @RequestBody TaskStatusUpdateDTO taskStatusUpdateDTO,
-            @PathVariable Long id
-    ) {
+    public TaskStatusDTO update(@Valid @RequestBody TaskStatusUpdateDTO taskStatusUpdateDTO, @PathVariable Long id) {
         return taskStatusService.update(taskStatusUpdateDTO, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void destroyById(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) throws Exception {
         taskStatusService.delete(id);
     }
 }

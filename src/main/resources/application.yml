@@ -1,22 +1,26 @@
-logging:
-  level:
-    root: warn
 spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
-    default: dev
   jpa:
     generate-ddl: true
     show-sql: true
-    open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
+
   output:
     ansi:
       enabled: always
+  instancio:
+    bean:
+      validation:
+        enabled: true
   sql:
     init:
       mode: always
+  profiles:
+    default: development
+
+logging:
+  level:
+    root: INFO
 
 springdoc:
   swagger-ui:

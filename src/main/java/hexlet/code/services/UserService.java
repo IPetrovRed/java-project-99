@@ -3,56 +3,55 @@ package hexlet.code.services;
 import hexlet.code.dto.users.UserCreateDTO;
 import hexlet.code.dto.users.UserDTO;
 import hexlet.code.dto.users.UserUpdateDTO;
+import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mappers.UserMapper;
-import hexlet.code.model.User;
 import hexlet.code.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
+
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private UserMapper mapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
-    public Page<User> getAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public UserDTO create(UserCreateDTO userCreateDTO) {
+        var user = userMapper.map(userCreateDTO);
+        userRepository.save(user);
+
+        return userMapper.map(user);
     }
 
     public List<UserDTO> getAll() {
-        return repository.findAll().stream().map(mapper::map).toList();
-    }
+        var users = userRepository.findAll();
 
-    public UserDTO create(UserCreateDTO userCreateDTO) {
-        var user = mapper.map(userCreateDTO);
-        repository.save(user);
-        return mapper.map(user);
+        return users.stream()
+                .map(userMapper::map)
+                .toList();
     }
 
     public UserDTO findById(Long id) {
-        return mapper.map(repository.findById(id)
-                .orElseThrow());
+        var user = userRepository.findByIdWithEagerUpload(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User With Id: " + id + " Not Found"));
+
+        return userMapper.map(user);
     }
 
     public UserDTO update(UserUpdateDTO userUpdateDTO, Long id) {
-        var user = repository.findById(id)
-                .orElseThrow();
+        var user = userRepository.findByIdWithEagerUpload(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User With Id: " + id + " Not Found"));
 
-        mapper.update(userUpdateDTO, user);
-        repository.save(user);
-        return mapper.map(user);
+        userMapper.update(userUpdateDTO, user);
+        userRepository.save(user);
+
+        return userMapper.map(user);
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(Long id) throws Exception {
+        userRepository.deleteById(id);
     }
-
 }
