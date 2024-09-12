@@ -6,6 +6,7 @@ import hexlet.code.dto.users.UserCreateDTO;
 import hexlet.code.services.LabelService;
 import hexlet.code.services.TaskStatusService;
 import hexlet.code.services.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) throws Exception {
 
         var admin = new UserCreateDTO("Admin", "Admin", "hexlet@example.com", "qwerty");
