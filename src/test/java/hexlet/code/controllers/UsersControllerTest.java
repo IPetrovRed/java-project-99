@@ -5,6 +5,7 @@ import hexlet.code.model.User;
 import hexlet.code.repositories.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -24,11 +25,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
+//@Transactional
 public class UsersControllerTest {
 
     @Autowired
@@ -39,6 +40,15 @@ public class UsersControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserRepository taskRepository;
+
+    @Autowired
+    private UserRepository labelRepository;
+
+    @Autowired
+    private UserRepository taskStatusRepository;
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -54,6 +64,15 @@ public class UsersControllerTest {
         userRepository.save(testUser);
         userRepository.save(anotherUser);
     }
+
+    @AfterEach
+    public void clean() {
+        taskRepository.deleteAll();
+        userRepository.deleteAll();
+        labelRepository.deleteAll();
+        taskStatusRepository.deleteAll();
+    }
+
     @Test
     public void testShow() throws Exception {
 
@@ -152,6 +171,5 @@ public class UsersControllerTest {
         var request = delete("/api/users/{id}", testUser.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
-
     }
 }
