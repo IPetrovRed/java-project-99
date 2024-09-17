@@ -25,11 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-//@Transactional
 public class UsersControllerTest {
 
     @Autowired
@@ -171,5 +169,6 @@ public class UsersControllerTest {
         var request = delete("/api/users/{id}", testUser.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
+
     }
 }

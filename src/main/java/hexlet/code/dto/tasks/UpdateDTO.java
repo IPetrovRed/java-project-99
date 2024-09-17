@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.Set;
 
@@ -17,25 +16,27 @@ import java.util.Set;
 @AllArgsConstructor
 public class UpdateDTO {
 
-    private JsonNullable<Integer> index;
+    private Integer index;
 
     @JsonProperty("assignee_id")
-    private JsonNullable<Long> assigneeId;
+    private Long assigneeId;
 
     @NotBlank
-    private JsonNullable<String> title;
+    private String title;
 
     @NotBlank
-    private JsonNullable<String> content;
+    private String content;
 
     @NotNull
-    private JsonNullable<String> status;
+    private String status;
 
-    private JsonNullable<Set<Long>> taskLabelIds;
+    private Set<Long> taskLabelIds;
 
     public UpdateDTO(String title, String content, String status) {
-        this.title = JsonNullable.of(title);
-        this.content = JsonNullable.of(content);
-        this.status = JsonNullable.of(status);
+
+        this.title = title;
+        this.content = content;
+        this.status = status;
     }
+
 }

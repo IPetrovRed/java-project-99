@@ -21,7 +21,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,11 +34,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class LabelsControllerTest {
 
     @Autowired
-
     private MockMvc mockMvc;
 
     @Autowired
@@ -80,14 +77,10 @@ public class LabelsControllerTest {
 
         taskStatusRepository.save(testTaskStatus);
         userRepository.save(testUser);
-
         testTask.setTaskStatus(testTaskStatus);
         testTask.setAssignee(testUser);
-
         taskRepository.save(testTask);
         labelRepository.save(testLabel);
-        taskStatusRepository.save(testTaskStatus);
-        userRepository.save(testUser);
     }
 
     @AfterEach
@@ -136,7 +129,6 @@ public class LabelsControllerTest {
 
     @Test
     public void updateTest() throws Exception {
-        // Убедитесь, что имени "new Label1" нет в базе данных
         assertThat(labelRepository.findByName("new Label1")).isNotPresent();
 
         var dto = new LabelUpdateDTO("new Label1");
