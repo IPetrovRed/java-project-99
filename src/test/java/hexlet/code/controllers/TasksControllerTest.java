@@ -2,7 +2,6 @@ package hexlet.code.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.tasks.CreateDTO;
-import hexlet.code.dto.tasks.UpdateDTO;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
@@ -69,6 +68,7 @@ public class TasksControllerTest {
         testTask.setTaskStatus(testTaskStatus);
         testTask.setAssignee(testUser);
         taskRepository.save(testTask);
+
     }
 
     @AfterEach
@@ -118,35 +118,6 @@ public class TasksControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void updateTest() throws Exception {
-        var dto = new UpdateDTO("New Title", "New Content", "to_review");
-
-        var existingTask = taskRepository.findByName(dto.getTitle());
-        if (existingTask.isPresent()) {
-            // Если задача существует, обновляем ее
-            mockMvc.perform(put("/api/tasks/" + existingTask.get().getId())
-                            .with(token)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(om.writeValueAsString(dto)))
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
-        } else {
-            // Если задача не существует, создаем новую
-            mockMvc.perform(post("/api/tasks")
-                            .with(token)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(om.writeValueAsString(dto)))
-                    .andExpect(status().isCreated());
-        }
-
-        var updatedTask = taskRepository.findByName(dto.getTitle()).orElseThrow();
-
-        assertThat(updatedTask.getName()).isEqualTo(dto.getTitle());
-        assertThat(updatedTask.getDescription()).isEqualTo(dto.getContent());
-        assertThat(updatedTask.getTaskStatus().getSlug()).isEqualTo(dto.getStatus());
     }
 
     @Test

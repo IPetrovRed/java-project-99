@@ -38,5 +38,4 @@ public class UpdateDTO {
         this.content = content;
         this.status = status;
     }
-
 }
