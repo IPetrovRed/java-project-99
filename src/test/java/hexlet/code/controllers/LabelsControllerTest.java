@@ -116,15 +116,6 @@ public class LabelsControllerTest {
     }
 
     @Test
-    public void indexTest2() throws Exception {
-        var response = mockMvc.perform(get("/api/labels")
-                        .with(token))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        assertThat(response).contains(testLabel.getName());
-    }
-
-    @Test
     public void testIndex() throws Exception {
         var response = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
