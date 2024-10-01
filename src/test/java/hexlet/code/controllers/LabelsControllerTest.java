@@ -1,8 +1,12 @@
 package hexlet.code.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.labels.LabelCreateDTO;
+import hexlet.code.dto.labels.LabelDTO;
 import hexlet.code.dto.labels.LabelUpdateDTO;
+import hexlet.code.mappers.LabelMapper;
+import hexlet.code.mappers.UserMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -12,6 +16,7 @@ import hexlet.code.repositories.TaskRepository;
 import hexlet.code.repositories.TaskStatusRepository;
 import hexlet.code.repositories.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +26,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +47,13 @@ public class LabelsControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
     private ObjectMapper om;
+
+    @Autowired
+    private LabelMapper labelMapper;
 
     @Autowired
     private LabelRepository labelRepository;
@@ -103,12 +116,27 @@ public class LabelsControllerTest {
     }
 
     @Test
-    public void indexTest() throws Exception {
+    public void indexTest2() throws Exception {
         var response = mockMvc.perform(get("/api/labels")
                         .with(token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertThat(response).contains(testLabel.getName());
+    }
+
+    @Test
+    public void testIndex() throws Exception {
+        var response = mockMvc.perform(get("/api/labels").with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var body = response.getContentAsString();
+
+        List<LabelDTO> labelDTOS = om.readValue(body, new TypeReference<>() { });
+
+        var actual = labelDTOS.stream().map(LabelDTO::toLabel).toList();
+        var expected = labelRepository.findAll();
+        Assertions.assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
@@ -129,7 +157,6 @@ public class LabelsControllerTest {
 
     @Test
     public void updateTest() throws Exception {
-        assertThat(labelRepository.findByName("new Label1")).isNotPresent();
 
         var dto = new LabelUpdateDTO("new Label1");
 

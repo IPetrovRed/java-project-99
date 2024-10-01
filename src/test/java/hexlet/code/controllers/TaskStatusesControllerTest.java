@@ -3,7 +3,9 @@ package hexlet.code.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.taskStatuses.TaskStatusUpdateDTO;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repositories.TaskRepository;
 import hexlet.code.repositories.TaskStatusRepository;
+import hexlet.code.repositories.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,6 +39,12 @@ public class TaskStatusesControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ModelGenerator modelGenerator;
 
     private TaskStatus testTaskStatus;
@@ -51,6 +58,9 @@ public class TaskStatusesControllerTest {
     @AfterEach
     public void tearDown() {
         taskStatusRepository.deleteAll();
+        taskRepository.deleteAll();
+        taskStatusRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -113,7 +123,7 @@ public class TaskStatusesControllerTest {
                         .with(jwt().jwt(builder -> builder.subject("hexlet@example.com"))))
                 .andExpect(status().isNoContent())
                 .andReturn().getResponse();
-        assertFalse(taskStatusRepository.findBySlug(testTaskStatus.getSlug()).isPresent());
+        assertThat(taskStatusRepository.findBySlug(testTaskStatus.getSlug())).isNotPresent();
     }
 
     @Test
